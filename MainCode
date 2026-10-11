@@ -1,0 +1,501 @@
+// AI use: Claude was used to help write this code.
+#include <iostream> 
+using namespace std; 
+const int CAPACITY = 5; // the array versions hold at most 5 items
+struct Node 
+{ 
+ int value; 
+ Node* next; 
+}; 
+struct DoubleNode 
+{ 
+ int value; 
+ DoubleNode* next; 
+ DoubleNode* prev; 
+}; 
+// 1. Stack (array)
+struct ArrayStack 
+{ 
+ int data[CAPACITY]; 
+ int count = 0; // the top of the stack is data[count - 1] 
+}; 
+bool isEmpty(ArrayStack& s) 
+{ 
+ return s.count == 0; 
+} 
+void push(ArrayStack& s, int value) 
+{ 
+ if (s.count == CAPACITY) 
+ { 
+ cout << "push " << value << " -> stack is full" << endl;  return; 
+ } 
+ s.data[s.count] = value; 
+ s.count++; 
+ cout << "push " << value << endl; 
+} 
+void pop(ArrayStack& s) 
+{ 
+ if (s.count == 0) 
+ { 
+ cout << "pop -> stack is empty" << endl; 
+ return; 
+ } 
+ s.count--; 
+ cout << "pop -> " << s.data[s.count] << endl; 
+} 
+void peek(ArrayStack& s) 
+{ 
+ if (s.count == 0) 
+ { 
+ cout << "peek -> stack is empty" << endl; 
+ return; 
+ } 
+ cout << "peek -> " << s.data[s.count - 1] << endl; } 
+void print(ArrayStack& s) 
+{ 
+ cout << " stack (top first):"; 
+ for (int i = s.count - 1; i >= 0; i--) 
+ { 
+ cout << " " << s.data[i]; 
+ } 
+ cout << endl; 
+} 
+// 2. Stack (linked list)
+struct LinkedStack 
+{ 
+ Node* top = nullptr; 
+};
+bool isEmpty(LinkedStack& s) 
+{ 
+ return s.top == nullptr; 
+} 
+void push(LinkedStack& s, int value) 
+{ 
+ s.top = new Node{value, s.top}; 
+ cout << "push " << value << endl; 
+} 
+void pop(LinkedStack& s) 
+{ 
+ if (s.top == nullptr) 
+ { 
+ cout << "pop -> stack is empty" << endl; 
+ return; 
+ } 
+ Node* old = s.top; 
+ cout << "pop -> " << old->value << endl; 
+ s.top = old->next; 
+ delete old; 
+} 
+void peek(LinkedStack& s) 
+{ 
+ if (s.top == nullptr) 
+ { 
+ cout << "peek -> stack is empty" << endl; 
+ return; 
+ } 
+ cout << "peek -> " << s.top->value << endl; 
+} 
+void print(LinkedStack& s) 
+{ 
+ cout << " stack (top first):"; 
+ for (Node* cur = s.top; cur != nullptr; cur = cur->next) 
+ { 
+ cout << " " << cur->value; 
+ } 
+ cout << endl; 
+} 
+// 3. Queue (array)
+struct ArrayQueue 
+{ 
+ int data[CAPACITY]; 
+ int start = 0; // where the front of the queue is 
+ int count = 0; // the back is at (start + count) % CAPACITY, so it wraps around 
+}; 
+bool isEmpty(ArrayQueue& q) 
+{ 
+ return q.count == 0; 
+} 
+void enqueue(ArrayQueue& q, int value) 
+{ 
+ if (q.count == CAPACITY) 
+ { 
+ cout << "enqueue " << value << " -> queue is full" << endl;  return; 
+ } 
+ q.data[(q.start + q.count) % CAPACITY] = value; 
+ q.count++; 
+ cout << "enqueue " << value << endl; 
+} 
+void dequeue(ArrayQueue& q) 
+{ 
+ if (q.count == 0) 
+ { 
+ cout << "dequeue -> queue is empty" << endl;
+ return; 
+ } 
+ cout << "dequeue -> " << q.data[q.start] << endl;  q.start = (q.start + 1) % CAPACITY; 
+ q.count--; 
+} 
+void front(ArrayQueue& q) 
+{ 
+ if (q.count == 0) 
+ { 
+ cout << "front -> queue is empty" << endl;  return; 
+ } 
+ cout << "front -> " << q.data[q.start] << endl; } 
+void print(ArrayQueue& q) 
+{ 
+ cout << " queue (front first):"; 
+ for (int i = 0; i < q.count; i++) 
+ { 
+ cout << " " << q.data[(q.start + i) % CAPACITY];  } 
+ cout << endl; 
+} 
+// 4. Queue (linked list)
+struct LinkedQueue 
+{ 
+ Node* head = nullptr; // dequeue from here  
+ Node* tail = nullptr; // enqueue here 
+}; 
+bool isEmpty(LinkedQueue& q) 
+{ 
+ return q.head == nullptr; 
+} 
+void enqueue(LinkedQueue& q, int value) 
+{ 
+ Node* node = new Node{value, nullptr}; 
+ if (q.tail == nullptr) 
+ { 
+ q.head = node; 
+ } 
+ else 
+ { 
+ q.tail->next = node; 
+ } 
+ q.tail = node; 
+ cout << "enqueue " << value << endl; 
+} 
+void dequeue(LinkedQueue& q) 
+{ 
+ if (q.head == nullptr) 
+ { 
+ cout << "dequeue -> queue is empty" << endl;  return; 
+ } 
+ Node* old = q.head; 
+ cout << "dequeue -> " << old->value << endl;  q.head = old->next; 
+ if (q.head == nullptr) 
+ { 
+ q.tail = nullptr; // the queue is empty now  
+ } 
+ delete old; 
+} 
+void front(LinkedQueue& q) 
+{ 
+ if (q.head == nullptr)
+ { 
+ cout << "front -> queue is empty" << endl; 
+ return; 
+ } 
+ cout << "front -> " << q.head->value << endl; 
+} 
+void print(LinkedQueue& q) 
+{ 
+ cout << " queue (front first):"; 
+ for (Node* cur = q.head; cur != nullptr; cur = cur->next) 
+ { 
+ cout << " " << cur->value; 
+ } 
+ cout << endl; 
+} 
+// 5. Deque (array) 
+struct ArrayDeque 
+{ 
+ int data[CAPACITY]; 
+ int start = 0; // where the front of the deque is 
+ int count = 0; 
+}; 
+bool isEmpty(ArrayDeque& d) 
+{ 
+ return d.count == 0; 
+} 
+void pushFront(ArrayDeque& d, int value) 
+{ 
+ if (d.count == CAPACITY) 
+ { 
+ cout << "pushFront " << value << " -> deque is full" << endl;  return; 
+ } 
+ d.start = (d.start + CAPACITY - 1) % CAPACITY; // step back one, wrapping around  
+ d.data[d.start] = value; 
+ d.count++; 
+ cout << "pushFront " << value << endl; 
+} 
+void pushBack(ArrayDeque& d, int value) 
+{ 
+ if (d.count == CAPACITY) 
+ { 
+ cout << "pushBack " << value << " -> deque is full" << endl;  return; 
+ } 
+ d.data[(d.start + d.count) % CAPACITY] = value; 
+ d.count++; 
+ cout << "pushBack " << value << endl; 
+} 
+void popFront(ArrayDeque& d) 
+{ 
+ if (d.count == 0) 
+ { 
+ cout << "popFront -> deque is empty" << endl; 
+ return; 
+ } 
+ cout << "popFront -> " << d.data[d.start] << endl; 
+ d.start = (d.start + 1) % CAPACITY; 
+ d.count--; 
+} 
+void popBack(ArrayDeque& d) 
+{ 
+ if (d.count == 0) 
+ { 
+ cout << "popBack -> deque is empty" << endl; 
+ return; 
+ }
+ cout << "popBack -> " << d.data[(d.start + d.count - 1) % CAPACITY] << endl;  d.count--; 
+} 
+void peekFront(ArrayDeque& d) 
+{ 
+ if (d.count == 0) 
+ { 
+ cout << "peekFront -> deque is empty" << endl; 
+ return; 
+ } 
+ cout << "peekFront -> " << d.data[d.start] << endl; 
+} 
+void peekBack(ArrayDeque& d) 
+{ 
+ if (d.count == 0) 
+ { 
+ cout << "peekBack -> deque is empty" << endl; 
+ return; 
+ } 
+ cout << "peekBack -> " << d.data[(d.start + d.count - 1) % CAPACITY] << endl; } 
+void print(ArrayDeque& d) 
+{ 
+ cout << " deque (front first):"; 
+ for (int i = 0; i < d.count; i++) 
+ { 
+ cout << " " << d.data[(d.start + i) % CAPACITY]; 
+ } 
+ cout << endl; 
+} 
+// 6. Deque (linked list)
+struct LinkedDeque 
+{ 
+ DoubleNode* head = nullptr; 
+ DoubleNode* tail = nullptr; 
+}; 
+bool isEmpty(LinkedDeque& d) 
+{ 
+ return d.head == nullptr; 
+} 
+void pushFront(LinkedDeque& d, int value) 
+{ 
+ DoubleNode* node = new DoubleNode{value, d.head, nullptr};  if (d.head == nullptr) 
+ { 
+ d.tail = node; 
+ } 
+ else 
+ { 
+ d.head->prev = node; 
+ } 
+ d.head = node; 
+ cout << "pushFront " << value << endl; 
+} 
+void pushBack(LinkedDeque& d, int value) 
+{ 
+ DoubleNode* node = new DoubleNode{value, nullptr, d.tail};  if (d.tail == nullptr) 
+ { 
+ d.head = node; 
+ } 
+ else 
+ { 
+ d.tail->next = node; 
+ } 
+ d.tail = node; 
+ cout << "pushBack " << value << endl;
+} 
+void popFront(LinkedDeque& d) 
+{ 
+ if (d.head == nullptr) 
+ { 
+ cout << "popFront -> deque is empty" << endl;  return; 
+ } 
+ DoubleNode* old = d.head; 
+ cout << "popFront -> " << old->value << endl; 
+ d.head = old->next; 
+ if (d.head == nullptr) 
+ { 
+ d.tail = nullptr; 
+ } 
+ else 
+ { 
+ d.head->prev = nullptr; 
+ } 
+ delete old; 
+} 
+void popBack(LinkedDeque& d) 
+{ 
+ if (d.tail == nullptr) 
+ { 
+ cout << "popBack -> deque is empty" << endl;  return; 
+ } 
+ DoubleNode* old = d.tail; 
+ cout << "popBack -> " << old->value << endl; 
+ d.tail = old->prev; 
+ if (d.tail == nullptr) 
+ { 
+ d.head = nullptr; 
+ } 
+ else 
+ { 
+ d.tail->next = nullptr; 
+ } 
+ delete old; 
+} 
+void peekFront(LinkedDeque& d) 
+{ 
+ if (d.head == nullptr) 
+ { 
+ cout << "peekFront -> deque is empty" << endl;  return; 
+ } 
+ cout << "peekFront -> " << d.head->value << endl; } 
+void peekBack(LinkedDeque& d) 
+{ 
+ if (d.tail == nullptr) 
+ { 
+ cout << "peekBack -> deque is empty" << endl;  return; 
+ } 
+ cout << "peekBack -> " << d.tail->value << endl; } 
+void print(LinkedDeque& d) 
+{ 
+ cout << " deque (front first):"; 
+ for (DoubleNode* cur = d.head; cur != nullptr; cur = cur->next)  { 
+ cout << " " << cur->value; 
+ } 
+ cout << endl; 
+} 
+
+// Demo
+
+int main()
+{
+    cout << boolalpha;      // print true/false instead of 1/0
+ 
+    // Stack (array)
+    cout << "=== Stack (array) ===" << endl;
+    ArrayStack arrayStack;
+    pop(arrayStack);            // empty
+    peek(arrayStack);           // empty
+    push(arrayStack, 10);
+    push(arrayStack, 20);
+    push(arrayStack, 30);
+    print(arrayStack);
+    peek(arrayStack);
+    pop(arrayStack);
+    push(arrayStack, 40);
+    pop(arrayStack);
+    pop(arrayStack);
+    pop(arrayStack);
+    pop(arrayStack);            // empty again
+    cout << "isEmpty: " << isEmpty(arrayStack) << endl << endl;
+ 
+    // Stack (linked list)
+    cout << "=== Stack (linked list) ===" << endl;
+    LinkedStack linkedStack;
+    pop(linkedStack);            // empty
+    peek(linkedStack);           // empty
+    push(linkedStack, 10);
+    push(linkedStack, 20);
+    push(linkedStack, 30);
+    print(linkedStack);
+    peek(linkedStack);
+    pop(linkedStack);
+    push(linkedStack, 40);
+    pop(linkedStack);
+    pop(linkedStack);
+    pop(linkedStack);
+    pop(linkedStack);            // empty again
+    cout << "isEmpty: " << isEmpty(linkedStack) << endl << endl;
+ 
+    // Queue (array)
+    cout << "=== Queue (array) ===" << endl;
+    ArrayQueue arrayQueue;
+    dequeue(arrayQueue);             // empty
+    front(arrayQueue);               // empty
+    enqueue(arrayQueue, 10);
+    enqueue(arrayQueue, 20);
+    enqueue(arrayQueue, 30);
+    print(arrayQueue);
+    front(arrayQueue);
+    dequeue(arrayQueue);
+    enqueue(arrayQueue, 40);
+    dequeue(arrayQueue);
+    dequeue(arrayQueue);
+    dequeue(arrayQueue);
+    dequeue(arrayQueue);             // empty again
+    cout << "isEmpty: " << isEmpty(arrayQueue) << endl << endl;
+ 
+    // Queue (linked list)
+    cout << "=== Queue (linked list) ===" << endl;
+    LinkedQueue linkedQueue;
+    dequeue(linkedQueue);             // empty
+    front(linkedQueue);               // empty
+    enqueue(linkedQueue, 10);
+    enqueue(linkedQueue, 20);
+    enqueue(linkedQueue, 30);
+    print(linkedQueue);
+    front(linkedQueue);
+    dequeue(linkedQueue);
+    enqueue(linkedQueue, 40);
+    dequeue(linkedQueue);
+    dequeue(linkedQueue);
+    dequeue(linkedQueue);
+    dequeue(linkedQueue);             // empty again
+    cout << "isEmpty: " << isEmpty(linkedQueue) << endl << endl;
+ 
+    // Deque (array)
+    cout << "=== Deque (array) ===" << endl;
+    ArrayDeque arrayDeque;
+    popFront(arrayDeque);            // empty
+    popBack(arrayDeque);             // empty
+    pushBack(arrayDeque, 20);
+    pushBack(arrayDeque, 30);
+    pushFront(arrayDeque, 10);
+    pushFront(arrayDeque, 5);
+    print(arrayDeque);
+    peekFront(arrayDeque);
+    peekBack(arrayDeque);
+    popFront(arrayDeque);
+    popBack(arrayDeque);
+    popBack(arrayDeque);
+    popFront(arrayDeque);
+    popBack(arrayDeque);             // empty again
+    cout << "isEmpty: " << isEmpty(arrayDeque) << endl << endl;
+ 
+    // Deque (linked list)
+    cout << "=== Deque (linked list) ===" << endl;
+    LinkedDeque linkedDeque;
+    popFront(linkedDeque);            // empty
+    popBack(linkedDeque);             // empty
+    pushBack(linkedDeque, 20);
+    pushBack(linkedDeque, 30);
+    pushFront(linkedDeque, 10);
+    pushFront(linkedDeque, 5);
+    print(linkedDeque);
+    peekFront(linkedDeque);
+    peekBack(linkedDeque);
+    popFront(linkedDeque);
+    popBack(linkedDeque);
+    popBack(linkedDeque);
+    popFront(linkedDeque);
+    popBack(linkedDeque);             // empty again
+    cout << "isEmpty: " << isEmpty(linkedDeque) << endl;
+ 
+    return 0;
+}
